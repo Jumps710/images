@@ -470,6 +470,30 @@
                     </div>
                 </div>
 
+                <h3>🔄 CI/CDフロー詳細</h3>
+                <div class="grid grid-2">
+                    <div class="card card-success">
+                        <h3>🖥️ フロントエンド CI/CD</h3>
+                        <ul>
+                            <li><strong>リポジトリ:</strong> GitHub (keim1029/greencarbon)</li>
+                            <li><strong>CI/CD:</strong> AWS Amplify</li>
+                            <li><strong>ホスティング:</strong> S3 + CloudFront</li>
+                            <li><strong>自動化:</strong> 完全自動デプロイ</li>
+                        </ul>
+                        <div class="status-badge status-warning">個人アカウント使用中</div>
+                    </div>
+                    <div class="card card-success">
+                        <h3>⚙️ バックエンド CI/CD</h3>
+                        <ul>
+                            <li><strong>リポジトリ:</strong> GitHub (ito-labolabo/*)</li>
+                            <li><strong>CI/CD:</strong> CircleCI</li>
+                            <li><strong>ホスティング:</strong> ECS/Fargate</li>
+                            <li><strong>コンテナ:</strong> ECR → ECS</li>
+                        </ul>
+                        <div class="status-badge status-good">組織アカウント</div>
+                    </div>
+                </div>
+
                 <div class="grid grid-3">
                     <div class="card card-success">
                         <h3>✅ 良好な部分</h3>
@@ -478,6 +502,7 @@
                             <li>Vue.js 3.x（モダン）</li>
                             <li>Aurora MySQL（高性能）</li>
                             <li>CloudFront（高速配信）</li>
+                            <li>Amplify自動デプロイ</li>
                         </ul>
                     </div>
                     <div class="card card-warning">
@@ -486,6 +511,7 @@
                             <li>Rails 6.1.x（Rails 7.xが最新）</li>
                             <li>2つのAPIアプリ（複雑）</li>
                             <li>STG環境なし</li>
+                            <li>CI/CDツール分散（Amplify vs CircleCI）</li>
                             <li>運用プロセス不統一</li>
                         </ul>
                     </div>
@@ -495,6 +521,7 @@
                             <li>Ruby 2.6.10（EOL）</li>
                             <li>メール認証未実装</li>
                             <li>本番10ヶ月未更新</li>
+                            <li><strong>個人GitHubアカウント依存</strong></li>
                             <li>セキュリティリスク</li>
                         </ul>
                     </div>
@@ -524,6 +551,13 @@
                         <th>詳細</th>
                     </tr>
                     <tr>
+                        <td><strong>個人GitHubアカウント依存</strong></td>
+                        <td><span class="status-danger">高</span></td>
+                        <td><span class="status-warning">中</span></td>
+                        <td><span class="highlight">最高</span></td>
+                        <td>アクセス喪失、事業継続リスク</td>
+                    </tr>
+                    <tr>
                         <td>メール認証未実装</td>
                         <td><span class="status-danger">高</span></td>
                         <td><span class="status-danger">高</span></td>
@@ -531,18 +565,18 @@
                         <td>なりすまし、不正アクセスリスク</td>
                     </tr>
                     <tr>
-                        <td>個人GitHubアカウント</td>
-                        <td><span class="status-danger">高</span></td>
-                        <td><span class="status-warning">中</span></td>
-                        <td><span class="status-danger">高</span></td>
-                        <td>アクセス喪失リスク</td>
-                    </tr>
-                    <tr>
                         <td>Ruby 2.6.10使用</td>
                         <td><span class="status-danger">高</span></td>
                         <td><span class="status-danger">高</span></td>
                         <td><span class="status-danger">高</span></td>
                         <td>セキュリティパッチ未提供</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CDツール分散</td>
+                        <td><span class="status-warning">中</span></td>
+                        <td><span class="status-danger">高</span></td>
+                        <td><span class="status-warning">中</span></td>
+                        <td>運用複雑化、障害時対応困難</td>
                     </tr>
                     <tr>
                         <td>本番10ヶ月未更新</td>
@@ -563,11 +597,19 @@
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <div class="metric-value">2</div>
+                        <div class="metric-label">CI/CDツール<br/>(Amplify + CircleCI)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">2</div>
                         <div class="metric-label">分離されたRailsアプリ</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-value">10</div>
                         <div class="metric-label">ヶ月本番未更新</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">1</div>
+                        <div class="metric-label">個人GitHubアカウント<br/>(keim1029)</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-value">0</div>
@@ -698,6 +740,11 @@
                                 Aurora[(Aurora MySQL)]
                             end
                             
+                            subgraph "🔄 統合CI/CD"
+                                GitHub[組織GitHubアカウント<br/>monorepo]
+                                CircleCI[統一CircleCI]
+                            end
+                            
                             subgraph "📊 監視・運用"
                                 CW[CloudWatch]
                                 Alert[アラート通知]
@@ -715,9 +762,15 @@
                             UnifiedAPI --> CW
                             CW --> Alert
                             
+                            GitHub --> CircleCI
+                            CircleCI --> S3_Prod
+                            CircleCI --> UnifiedAPI
+                            
                             style UnifiedAPI fill:#e8f5e9
                             style Aurora fill:#e3f2fd
                             style CloudFront fill:#fff3e0
+                            style GitHub fill:#f3e5f5
+                            style CircleCI fill:#e8f5e9
                     </div>
                 </div>
 
@@ -739,6 +792,7 @@
                             <li>可用性: 99% → 99.9%</li>
                             <li>運用コスト: 20%削減</li>
                             <li>開発効率: 2倍向上</li>
+                            <li><strong>CI/CD統一</strong></li>
                         </ul>
                     </div>
                     <div class="card card-success">
@@ -746,6 +800,7 @@
                         <ul>
                             <li>メール認証実装</li>
                             <li>Ruby 3.2.2対応</li>
+                            <li><strong>組織GitHubアカウント</strong></li>
                             <li>脆弱性ゼロ</li>
                             <li>監査適合率100%</li>
                         </ul>
@@ -832,6 +887,7 @@
                                 <li>📧 メール認証機能実装</li>
                                 <li>🔄 Ruby 2.6.10 → 3.2.2</li>
                                 <li>💾 バックアップ体制確立</li>
+                                <li><strong>📁 個人GitHub → 組織アカウント移行</strong></li>
                             </ul>
                             <p><strong>投資: 150万円</strong></p>
                         </div>
@@ -844,8 +900,9 @@
                             <ul>
                                 <li>🏗️ STG環境構築</li>
                                 <li>🔗 2つのRailsアプリ統合</li>
-                                <li>⚙️ CI/CD統一</li>
+                                <li>⚙️ CI/CD統一（Amplify → CircleCI）</li>
                                 <li>🚀 ECS Fargate移行</li>
+                                <li><strong>📦 monorepo構成への移行</strong></li>
                             </ul>
                             <p><strong>投資: 300万円</strong></p>
                         </div>
@@ -930,11 +987,61 @@
                 <div class="warning-box">
                     <h3>🚨 緊急対応が必要な項目</h3>
                     <ul>
+                        <li><strong>個人GitHubアカウントの組織移行</strong>（事業継続リスク）</li>
                         <li><strong>メール認証の即時実装</strong>（なりすましリスク）</li>
                         <li><strong>Ruby 2.6.10の早期アップグレード</strong>（セキュリティ脆弱性）</li>
+                        <li><strong>CI/CDツールの統一計画策定</strong>（運用複雑化解消）</li>
                         <li><strong>本番環境の緊急パッチ適用</strong></li>
                         <li><strong>データベースバックアップの確認と強化</strong></li>
                     </ul>
+                </div>
+
+                <h3>🔄 GitHubアカウント移行の緊急性</h3>
+                <div class="grid grid-2">
+                    <div class="card card-danger">
+                        <h3>🚨 現状リスク</h3>
+                        <ul>
+                            <li><strong>keim1029/greencarbon</strong>（個人）</li>
+                            <li>単一障害点</li>
+                            <li>退職・異動時のアクセス喪失</li>
+                            <li>企業資産の個人管理</li>
+                            <li>監査・コンプライアンス問題</li>
+                        </ul>
+                    </div>
+                    <div class="card card-success">
+                        <h3>✅ 移行後の改善</h3>
+                        <ul>
+                            <li>組織GitHubアカウント</li>
+                            <li>複数メンバーのアクセス権</li>
+                            <li>適切な権限管理</li>
+                            <li>企業資産の適切な管理</li>
+                            <li>監査ログの一元化</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>🔧 CI/CDツール統一の効果</h3>
+                <div class="grid grid-2">
+                    <div class="card card-warning">
+                        <h3>⚠️ 現状の分散管理</h3>
+                        <ul>
+                            <li><strong>フロントエンド:</strong> AWS Amplify</li>
+                            <li><strong>バックエンド:</strong> CircleCI</li>
+                            <li>異なるツールでの管理</li>
+                            <li>設定・ノウハウの分散</li>
+                            <li>障害時対応の複雑化</li>
+                        </ul>
+                    </div>
+                    <div class="card card-success">
+                        <h3>✅ 統一後のメリット</h3>
+                        <ul>
+                            <li><strong>統一:</strong> CircleCI</li>
+                            <li>一元的な管理</li>
+                            <li>統一されたワークフロー</li>
+                            <li>チーム学習コスト削減</li>
+                            <li>フロント・バック連携デプロイ</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <h3>🔄 ベンダーへの確認事項</h3>
