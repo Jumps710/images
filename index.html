@@ -406,6 +406,7 @@
                     <ul>
                         <li><a href="#current-system">現状システム構成</a></li>
                         <li><a href="#problems">問題点分析</a></li>
+                        <li><a href="#construction-background">システム構築背景</a></li>
                         <li><a href="#vendor-proposals">ベンダー提案評価</a></li>
                         <li><a href="#plan-c">推奨プランC</a></li>
                         <li><a href="#house-analogy">住宅リフォーム比較</a></li>
@@ -623,7 +624,161 @@
             </div>
         </div>
 
-        <!-- ベンダー提案評価 -->
+        <!-- システム構築背景の分析 -->
+        <div class="slide" id="construction-background">
+            <div class="slide-header">
+                <h2>🔧 システム構築背景の分析</h2>
+                <div class="subtitle">個人開発における自動生成ツールの活用</div>
+            </div>
+            <div class="slide-content">
+                <div class="recommendation-box">
+                    <h3>💡 構築手法の推測</h3>
+                    <p>この規模のシステムを個人が短期間で構築するには、<strong>自動生成ツール・フレームワーク</strong>の活用が必須です。</p>
+                    <p>実際の構成パターンから、複数の自動生成ツールを組み合わせて構築されたと考えられます。</p>
+                </div>
+
+                <h3>🛠️ 使用されている可能性が高いツール</h3>
+                <div class="grid grid-3">
+                    <div class="card card-success">
+                        <h3>🌐 フロントエンド</h3>
+                        <p><strong>AWS Amplify CLI</strong></p>
+                        <ul>
+                            <li>S3 + CloudFront自動構築</li>
+                            <li>GitHub連携CI/CD</li>
+                            <li>認証システム自動設定</li>
+                            <li>1コマンドでインフラ生成</li>
+                        </ul>
+                        <div class="status-badge status-good">確度: 高</div>
+                    </div>
+                    <div class="card card-success">
+                        <h3>⚙️ バックエンド</h3>
+                        <p><strong>Rails Application Template</strong></p>
+                        <ul>
+                            <li>管理画面自動生成</li>
+                            <li>API認証自動設定</li>
+                            <li>CRUD機能一括生成</li>
+                            <li>Firebase統合テンプレート</li>
+                        </ul>
+                        <div class="status-badge status-good">確度: 高</div>
+                    </div>
+                    <div class="card card-success">
+                        <h3>☁️ インフラ</h3>
+                        <p><strong>AWS Copilot / CDK</strong></p>
+                        <ul>
+                            <li>ECS環境自動構築</li>
+                            <li>RDS Aurora自動設定</li>
+                            <li>Load Balancer自動構成</li>
+                            <li>本番・開発環境複製</li>
+                        </ul>
+                        <div class="status-badge status-warning">確度: 中</div>
+                    </div>
+                </div>
+
+                <h3>📋 構築シナリオの再現</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h3>🎯 Step 1: フロントエンド生成</h3>
+                            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; font-family: monospace;">
+                                <div>amplify init</div>
+                                <div>amplify add auth        # Firebase Auth設定</div>
+                                <div>amplify add api         # API Gateway設定</div>
+                                <div>amplify add hosting     # S3 + CloudFront</div>
+                                <div>amplify push           # 全インフラ自動デプロイ</div>
+                            </div>
+                            <p><strong>結果:</strong> 農家向け・管理者向けSPAが自動生成</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h3>🎯 Step 2: バックエンド生成</h3>
+                            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; font-family: monospace;">
+                                <div>rails new agreen-api -m enterprise_template.rb</div>
+                                <div>rails new agreen-management-api -m admin_template.rb</div>
+                                <div>rails generate scaffold User name:string email:string</div>
+                                <div>rails generate api_scaffold Application name:string</div>
+                            </div>
+                            <p><strong>結果:</strong> 認証・CRUD・管理画面が自動実装</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h3>🎯 Step 3: インフラ自動構築</h3>
+                            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; font-family: monospace;">
+                                <div>copilot app init agreen</div>
+                                <div>copilot svc init --name api</div>
+                                <div>copilot svc init --name management-api</div>
+                                <div>copilot env init --name production</div>
+                                <div>copilot svc deploy</div>
+                            </div>
+                            <p><strong>結果:</strong> ECS + RDS + ALBが自動構成</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>🕒 工数の現実性</h3>
+                <div class="grid grid-2">
+                    <div class="card card-success">
+                        <h3>✅ 自動生成ツール使用時</h3>
+                        <p><strong>個人構築期間: 2-3ヶ月</strong></p>
+                        <ul>
+                            <li>インフラ設計・構築: 2週間</li>
+                            <li>基本機能実装: 4週間</li>
+                            <li>カスタマイズ: 4週間</li>
+                            <li>テスト・調整: 2週間</li>
+                        </ul>
+                        <div class="status-badge status-good">現実的</div>
+                    </div>
+                    <div class="card card-danger">
+                        <h3>❌ 手動構築の場合</h3>
+                        <p><strong>同等システム: 6-12ヶ月</strong></p>
+                        <ul>
+                            <li>インフラ設計: 2ヶ月</li>
+                            <li>バックエンド開発: 4ヶ月</li>
+                            <li>フロントエンド開発: 3ヶ月</li>
+                            <li>統合・テスト: 3ヶ月</li>
+                        </ul>
+                        <div class="status-badge status-danger">非現実的</div>
+                    </div>
+                </div>
+
+                <h3>🔍 自動生成の証拠</h3>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <h3>📝 命名規則の一貫性</h3>
+                        <ul>
+                            <li>agreen-api / agreen-management-api</li>
+                            <li>agreen-front / agreen-management-front</li>
+                            <li>dev-agreen-* の開発環境複製</li>
+                        </ul>
+                        <p>→ テンプレートによる自動命名</p>
+                    </div>
+                    <div class="card">
+                        <h3>🏗️ 構造の規則性</h3>
+                        <ul>
+                            <li>4つのECSクラスターが同一構成</li>
+                            <li>CloudFront設定の類似性</li>
+                            <li>本番・開発環境の構造一致</li>
+                        </ul>
+                        <p>→ ボイラープレート使用</p>
+                    </div>
+                    <div class="card">
+                        <h3>⚙️ 技術選択の合理性</h3>
+                        <ul>
+                            <li>Firebase Auth（Google推奨）</li>
+                            <li>Aurora MySQL（AWS推奨）</li>
+                            <li>Vue.js 3.x（モダン選択）</li>
+                        </ul>
+                        <p>→ ベストプラクティステンプレート</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="slide" id="vendor-proposals">
             <div class="slide-header">
                 <h2>🤔 ベンダー提案の評価</h2>
